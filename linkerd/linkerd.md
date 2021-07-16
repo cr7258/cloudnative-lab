@@ -126,7 +126,7 @@ kubectl apply -k flagger/kustomize/linkerd
 
 ```sh
 kubectl create ns test && \
-  kubectl apply -f flagger.yml
+  kubectl apply -f demo.yml
 ```
 
 通过在本地转发前端服务并通过运行在本地的 http://localhost:8080 来打开检查它：
@@ -177,7 +177,7 @@ kubectl -n test get ev --watch
 将创建一个名为 podinfo-primary 的 deployment，其副本数量与 podinfo 具有的副本数量相同。
 
 ```sh
-❯ kt get deployments.apps -n test
+❯ kubectl get deployments.apps -n test
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
 frontend          1/1     1            1           90s
 load              1/1     1            1           90s
@@ -188,7 +188,7 @@ podinfo-primary   0/1     1            0           3s
 一旦新 Pod 准备就绪，原始部署将缩减为零：
 
 ```sh
-❯ kt get deployments.apps -n test
+❯ kubectl get deployments.apps -n test
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
 frontend          1/1     1            1           112s
 load              1/1     1            1           112s
@@ -199,7 +199,7 @@ podinfo-primary   1/1     1            1           25s
 除了托管部署之外，还创建了一些服务来协调应用程序的新旧版本之间的路由流量。 这些可以使用 kubectl -n test get svc 查看，应该如下所示：
 
 ```sh
-❯ kt get -n test svc
+❯ kubectl get -n test svc
 NAME              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
 frontend          ClusterIP   192.168.86.61    <none>        8080/TCP   15m
 podinfo           ClusterIP   192.168.241.0    <none>        9898/TCP   15m
