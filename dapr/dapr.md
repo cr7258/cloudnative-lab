@@ -1,7 +1,5 @@
 # Dapr
 
-官网地址：https://docs.dapr.io/
-
 Dapr 是一个可移植的、事件驱动的分布式应用运行时，它使任何开发人员能够轻松构建出弹性的、无状态和有状态的应用程序，并可运行在云平台或边缘计算中，它同时也支持多种编程语言和开发框架。
 
 Bilgin Ibryam 在 [Multi-Runtime Microservices Architecture](https://www.infoq.com/articles/multi-runtime-microservice-architecture/) 文章中提及的分布式应用的四大需求：

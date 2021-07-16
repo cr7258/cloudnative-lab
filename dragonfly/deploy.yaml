@@ -1,0 +1,144 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: supernode
+  name: supernode
+  namespace: kube-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: supernode
+  template:
+    metadata:
+      labels:
+        app: supernode
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+    spec:
+      containers:
+      - image: hub.c.163.com/hzlilanqing/supernode:0.3.0
+        name: supernode
+        ports:
+        - containerPort: 8080
+          hostPort: 8080
+          name: tomcat
+          protocol: TCP
+        - containerPort: 8001
+          hostPort: 8001
+          name: register
+          protocol: TCP
+        - containerPort: 8002
+          hostPort: 8002
+          name: download
+          protocol: TCP
+        resources:
+          requests:
+            cpu: "2"
+            memory: 4Gi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: ltime
+        - mountPath: /home/admin/supernode/logs/
+          name: log
+        - mountPath: /home/admin/supernode/repo/
+          name: data
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        operator: Exists
+      - effect: NoSchedule
+        operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: ltime
+      - hostPath:
+          path: /data/log/supernode
+          type: ""
+        name: log
+      - hostPath:
+          path: /data/supernode/repo/
+          type: ""
+        name: data
+        
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: supernode
+  namespace: kube-system
+spec:
+  selector:
+    app: supernode
+  ports:
+  - name: register
+    protocol: TCP
+    port: 8001
+    targetPort: 8001
+  - name: download
+    protocol: TCP
+    port: 8002
+    targetPort: 8002
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dfdaemon
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: dfdaemon
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+      labels:
+        app: dfdaemon
+    spec:
+      containers:
+      - image: hub.c.163.com/hzlilanqing/dfdaemon:0.2.0
+        name: dfdaemon
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 250m
+        volumeMounts:
+        - mountPath: /etc/dragonfly.conf
+          subPath: dragonfly.conf
+          name: dragonconf
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        operator: Exists
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+      - name: dragonconf
+        configMap:
+          name: dragonfly-conf
+          items:
+          - key: dragonfly.conf
+            path: dragonfly.conf
+
+---
+apiVersion: v1
+data:
+  dragonfly.conf: |
+    [node]
+    address=supernode
+kind: ConfigMap
+metadata:
+  name: dragonfly-conf
+  namespace: kube-system

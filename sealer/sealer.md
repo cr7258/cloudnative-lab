@@ -1,21 +1,24 @@
 # Sealer
 
+## 部署 Kubernetes 集群
 
+在阿里云上创建RAM用户并授予相应权限：
+```sh
+export ACCESSKEYID=LTAI5tFC7ez4xCqqZgcxxxxx
+export ACCESSKEYSECRET=ShKqqNNYgJZtL6XcRjmJfCAaxxxxx
 
 ```
-export ACCESSKEYID=LTAI5tFC7ez4xCqqZgcvabub
-export ACCESSKEYSECRET=ShKqqNNYgJZtL6XcRjmJfCAakD8ULp
-```
 
+在阿里云上创建一个 3 master，3 worker 的节点：
+```sh
+sealer run kubernetes:v1.19.9 --masters 3 --nodes 3 
 ```
-sealer run kubernetes:v1.19.9 --masters 3 --nodes 3 # 在公有云上运行指定数量节点的kuberentes集群
-```
-
 
 
 ![](https://chengzw258.oss-cn-beijing.aliyuncs.com/Article/20210714000520.png)
 
 
+## 构建镜像
 
 sealer build 的过程中和 Docker build 一样，会拉起一个临时的 Kubernetes 集群，并执行用户在 Kubefile 中定义的 apply 指令。
 
@@ -29,9 +32,7 @@ sealer build 的过程中和 Docker build 一样，会拉起一个临时的 Kube
 
 
 
-Sealer 最出色的地方是可以非常方便的让用户自定义一个集群的镜像，通过像Dockerfile 一样的文件来描述和build，创建名为 Kubefile 的文件，定义构建集群镜像的指令:
-
-
+Sealer 最出色的地方是可以非常方便的让用户自定义一个集群的镜像，通过像Dockerfile 一样的文件来描述和build，创建名为 Kubefile 的文件，定义构建集群镜像的指令，该镜像中会安装 Kubernetes Dashboard:
 
 ```
 FROM kubernetes:v1.19.9
@@ -53,3 +54,42 @@ sealer build -t registry.cn-shanghai.aliyuncs.com/sealer-namespace/dashboard:lat
 sealer push registry.cn-shanghai.aliyuncs.com/sealer-namespace/dashboard:latest
 ```
 
+## 通过 ClusterFile 部署 Kubernetes 集群
+
+sealer apply -f Clusterfile
+
+```yaml
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Cluster
+metadata:
+  name: my-cluster
+spec:
+  image: registry.cn-shanghai.aliyuncs.com/sealer-namespace/dashboard:latest
+  provider: ALI_CLOUD
+  network:
+    # in use NIC name
+    interface: eth0
+    # Network plug-in name
+    cniName: calico
+    podCIDR: 100.64.0.0/10
+    svcCIDR: 10.96.0.0/22
+    withoutCNI: false
+  certSANS:
+    - aliyun-inc.com
+    - 10.0.0.2
+    
+  masters:
+    cpu: 4
+    memory: 4
+    count: 3
+    systemDisk: 100
+    dataDisks:
+    - 100
+  nodes:
+    cpu: 4
+    memory: 4
+    count: 3
+    systemDisk: 100
+    dataDisks:
+    - 100
+```

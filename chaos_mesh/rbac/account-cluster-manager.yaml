@@ -1,0 +1,5 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: account-cluster-manager # use "account-cluster-viewer" for viewer
+  namespace: chaos-testing

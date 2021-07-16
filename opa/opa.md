@@ -1,6 +1,6 @@
 # Open Policy Agent（OPA）
 
-OPA是一个全场景通用的轻量策略引擎（Policy Engine），OPA 提供了声明式表达的 Rego 语言来描述策略，并将策略的决策 offload 到 OPA，从而将策略的决策过程从策略的执行中解耦。OPA 可适用于多种场景，比如 Kubernetes、Terraform、Envoy 等等，简而言之，以前需要使用到 Policy 的场景理论上都可以用 OPA 来做一层抽象，如下所示：
+OPA 是一个全场景通用的轻量策略引擎（Policy Engine），OPA 提供了声明式表达的 Rego 语言来描述策略，并将策略的决策 offload 到 OPA，从而将策略的决策过程从策略的执行中解耦。OPA 可适用于多种场景，比如 Kubernetes、Terraform、Envoy 等等，简而言之，以前需要使用到 Policy 的场景理论上都可以用 OPA 来做一层抽象，如下所示：
 
 ![](https://chengzw258.oss-cn-beijing.aliyuncs.com/Article/20210715112927.png)
 
