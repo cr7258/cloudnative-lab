@@ -6,7 +6,6 @@
 ```sh
 export ACCESSKEYID=LTAI5tFC7ez4xCqqZgcxxxxx
 export ACCESSKEYSECRET=ShKqqNNYgJZtL6XcRjmJfCAaxxxxx
-
 ```
 
 在阿里云上创建一个 3 master，3 worker 的节点：
